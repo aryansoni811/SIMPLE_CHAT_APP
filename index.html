@@ -2,28 +2,112 @@
 <html>
 <head>
   <title>Chat App</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    /* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+  }
+  
+  .chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .messages {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .messages li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+  }
+  
+  .message-form {
+    margin-top: 20px;
+    display: flex;
+  }
+  
+  .message-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+  }
+  
+  .send-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .send-button:hover {
+    background-color: #0056b3;
+  }
+  
+  @media (max-width: 480px) {
+    .chat-container {
+      padding: 10px;
+    }
+  
+    .message-input {
+      font-size: 14px;
+    }
+  }
+  </style>
 </head>
 <body>
-  <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-  </form>
+  <div class="chat-container">
+    <div class="messages-container">
+      <ul id="messages" class="messages"></ul>
+    </div>
+    <form id="form" class="message-form" action="">
+      <input id="input" class="message-input" autocomplete="off" placeholder="Type your message..."/>
+      <button class="send-button">Send</button>
+    </form>
+  </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(function () {
-      var socket = io();
+    var socket = io();
 
-      $('form').submit(function() {
-        socket.emit('chat message', $('#input').val());
+    $('#form').submit(function() {
+      var message = $('#input').val();
+      if (message.trim() !== '') {
+        socket.emit('chat message', message);
         $('#input').val('');
-        return false;
-      });
-
-      socket.on('chat message', function(msg) {
-        $('#messages').append($('<li>').text(msg));
-      });
+      }
+      return false;
     });
+
+    socket.on('chat message', function(msg) {
+      $('#messages').append($('<li>').text(msg));
+      scrollToBottom(); // Scroll to the bottom of the messages
+    });
+
+    // Scroll to the bottom of the messages container
+    function scrollToBottom() {
+      var messagesContainer = document.querySelector('.messages-container');
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  });
   </script>
 </body>
 </html>
