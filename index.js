@@ -21,7 +21,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+    const msg_string = JSON.stringify(msg['message']).slice(1, -1);
+    console.log(`message sent is ${msg_string}`);
+    if(msg_string.startsWith('/')){
+      socket.emit('chat message', msg);
+    }
+    else 
+      io.emit('chat message', msg);
   });
 
   socket.on('disconnect', () => {

@@ -75,7 +75,7 @@ body {
 <body>
   <div class="user-info">
     <label for="username">Your Name:</label>
-    <input type="text" id="username" placeholder="Enter your name" />
+    <input type="text" id="username" placeholder="Enter your name first!" />
     <button id="join-button">Join Chat</button>
   </div>
   <div class="chat-container">
@@ -100,7 +100,7 @@ body {
       $(function () {
         var socket = io();
         var username = '';
-      
+        
         $('#join-button').click(function() {
           username = $('#username').val().trim();
           if (username !== '') {
@@ -111,6 +111,11 @@ body {
         });
       
         $('#form').submit(function() {
+          while (username == '') {
+            username  = prompt("enter username first.");
+            username = username.val().trim();
+            socket.emit('user joined', username);
+          }
           var message = $('#input').val();
           if (message.trim() !== '') {
             socket.emit('chat message', { username, message });
