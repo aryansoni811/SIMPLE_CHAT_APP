@@ -99,7 +99,7 @@ body {
     <script>
       $(function () {
         var socket = io();
-        var username = '';
+        var username = "";
         
         $('#join-button').click(function() {
           username = $('#username').val().trim();
@@ -150,7 +150,27 @@ body {
           // Split the input string into an array of words
           const words = inputString.split(/\s+/);
           let str = "";
-          // Iterate through each word
+          //assignment-2 part
+          switch (words[0]) {
+            case "/help": {alert("hello guys this is your help");}
+                    break;
+            case "/random": {
+                const randomNumber = Math.random();
+                words[0] = randomNumber;
+              }
+                    break;
+            case "/clear": {
+                  const abcd = document.getElementById('messages');
+
+                  while (abcd.firstChild) {
+                      abcd.removeChild(abcd.firstChild);
+                    }
+                  }
+                    break;
+
+          }
+
+          //assignment-1 part
           for (let i = 0; i < words.length; i++) {
             let word = words[i];
             switch (word) {
