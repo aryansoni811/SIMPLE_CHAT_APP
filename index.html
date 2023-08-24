@@ -70,6 +70,12 @@ body {
       font-size: 14px;
     }
   }
+  .user-info{
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center;
+  }
   </style>
 </head>
 <body>
@@ -89,8 +95,10 @@ body {
       <ul id="messages" class="messages"></ul>
     </div>
     <form id="form" class="message-form" action="">
-      <input id="input" class="message-input" autocomplete="off" placeholder="Type your message..."/>
-      <button class="send-button">Send</button>
+      <div class="message-input-section" style="display: none;"></div>
+        <input id="input" class="message-input" autocomplete="off" placeholder="Type your message..."/>
+        <button class="send-button">Send</button>
+    </div>
     </form>
   </div>
   <script src="/socket.io/socket.io.js"></script>
@@ -100,7 +108,7 @@ body {
       $(function () {
         var socket = io();
         var username = "";
-        
+
         $('#join-button').click(function() {
           username = $('#username').val().trim();
           if (username !== '') {
@@ -112,7 +120,7 @@ body {
       
         $('#form').submit(function() {
           while (username == '') {
-            username  = prompt("enter username first.");
+            alert("enter username first. ");
             username = username.val().trim();
             socket.emit('user joined', username);
           }
@@ -133,6 +141,10 @@ body {
       
         socket.on('user joined', function(newUser) {
           $('#user-list').append($('<li>').text(newUser));
+
+            if ($('#user-list li').length > 0) {
+            $('.message-input-section').show();
+        }
         });
       
         socket.on('user left', function(user) {
@@ -161,13 +173,12 @@ body {
                     break;
             case "/clear": {
                   const abcd = document.getElementById('messages');
-
                   while (abcd.firstChild) {
                       abcd.removeChild(abcd.firstChild);
                     }
                   }
+                  words = [];
                     break;
-
           }
 
           //assignment-1 part
