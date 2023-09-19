@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     /* styles.css */
-body {
+  body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -45,6 +45,7 @@ body {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 20px;
+    max-width: 600px;
   }
   
   .send-button {
@@ -73,6 +74,8 @@ body {
   .user-info{
     padding: 20px;
     display: flex;
+    flex-direction: column;
+    gap: 20px;
     justify-content: center; /* Horizontal centering */
     align-items: center;
   }
@@ -80,15 +83,15 @@ body {
 </head>
 <body>
   <div class="user-info">
-    <label for="username">Your Name:</label>
-    <input type="text" id="username" placeholder="Enter your name first!" />
-    <button id="join-button">Join Chat</button>
+    <label for="username"><b>Your Name:</b></label>
+    <input type="text" id="username" class="message-input" placeholder="Enter your name first!" />
+    <button id="join-button" class="send-button">Join Chat</button>
   </div>
   <div class="chat-container">
     <!-- Add this section inside the .chat-container div -->
     <div class="sidebar">
-      <h2>Online Users123</h2>
-      <ul id="user-list"></ul>
+      <h2>Online Users</h2>
+      <ul id="user-list" ></ul>
     </div>
 
     <div class="messages-container">
@@ -164,7 +167,7 @@ body {
           let str = "";
           //assignment-2 part
           switch (words[0]) {
-            case "/help": {alert("hello guys this is your help");}
+            case "/help": {alert(`Working emojis: 'react'"⚛" 'hey' "👋" 'like' "❤" 'lol' "😂" 'woah'"😮" \n\n anything that starts with '/' will not get sent to all only to client side. \n\n Special Commands: /help /ranodm /clear"`)}
                     break;
             case "/random": {
                 const randomNumber = Math.random();
@@ -184,6 +187,7 @@ body {
           //assignment-1 part
           for (let i = 0; i < words.length; i++) {
             let word = words[i];
+            word = word.toLowerCase();
             switch (word) {
               case 'react': word = "⚛"
                     break;
