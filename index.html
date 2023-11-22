@@ -73,7 +73,18 @@ body {
   </style>
 </head>
 <body>
+  <div class="user-info">
+    <label for="username">Your Name:</label>
+    <input type="text" id="username" placeholder="Enter your name" />
+    <button id="join-button">Join Chat</button>
+  </div>
   <div class="chat-container">
+    <!-- Add this section inside the .chat-container div -->
+    <div class="sidebar">
+      <h2>Online Users123</h2>
+      <ul id="user-list"></ul>
+    </div>
+
     <div class="messages-container">
       <ul id="messages" class="messages"></ul>
     </div>
@@ -84,30 +95,80 @@ body {
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    $(function () {
-    var socket = io();
+<!-- Update your existing script block with the following code -->
+    <script>
+      $(function () {
+        var socket = io();
+        var username = '';
+      
+        $('#join-button').click(function() {
+          username = $('#username').val().trim();
+          if (username !== '') {
+            $('.user-info').hide();
+            $('.chat-container').show();
+            socket.emit('user joined', username);
+          }
+        });
+      
+        $('#form').submit(function() {
+          var message = $('#input').val();
+          if (message.trim() !== '') {
+            socket.emit('chat message', { username, message });
+            $('#input').val('');
+          }
+          return false;
+        });
+      
+        socket.on('chat message', function(data) {
+          var { username, message } = data;
+          message = processWords(message);
+          $('#messages').append($('<li>').text(`${username}: ${message}`));
+          scrollToBottom();
+        });
+      
+        socket.on('user joined', function(newUser) {
+          $('#user-list').append($('<li>').text(newUser));
+        });
+      
+        socket.on('user left', function(user) {
+          $('#user-list li').filter(function() {
+            return $(this).text() === user;
+          }).remove();
+        });
+      
+        function scrollToBottom() {
+          var messagesContainer = document.querySelector('.messages-container');
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-    $('#form').submit(function() {
-      var message = $('#input').val();
-      if (message.trim() !== '') {
-        socket.emit('chat message', message);
-        $('#input').val('');
-      }
-      return false;
-    });
+        function processWords(inputString) {
+          // Split the input string into an array of words
+          const words = inputString.split(/\s+/);
+          let str = "";
+          // Iterate through each word
+          for (let i = 0; i < words.length; i++) {
+            let word = words[i];
+            switch (word) {
+              case 'react': word = "⚛"
+                    break;
+              case 'hey': word = "👋"
+                    break;
+              case 'like': word = "❤"
+                    break;
+              case 'lol': word = "😂"
+                    break;
+              case 'woah': word = "😮"
+                    break;
+              case 'congratulations': word = "🎉"
+                    break;
+            }  
+            str = str + word + " ";      
+          }
+          return str;
+        }
+      });
+    </script>
 
-    socket.on('chat message', function(msg) {
-      $('#messages').append($('<li>').text(msg));
-      scrollToBottom(); // Scroll to the bottom of the messages
-    });
 
-    // Scroll to the bottom of the messages container
-    function scrollToBottom() {
-      var messagesContainer = document.querySelector('.messages-container');
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-  });
-  </script>
 </body>
 </html>

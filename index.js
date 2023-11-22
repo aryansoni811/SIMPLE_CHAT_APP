@@ -1,3 +1,4 @@
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -10,20 +11,27 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Listen for incoming messages
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg); // Broadcast the message to all connected clients
+  socket.on('user joined', (username) => {
+    socket.username = username;
+    io.emit('user joined', username);
   });
 
-  // Handle user disconnection
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg);
+  });
+
   socket.on('disconnect', () => {
-    console.log('A user disconnected');
+    if (socket.username) {
+      console.log(`User ${socket.username} disconnected`);
+      io.emit('user left', socket.username);
+    }
   });
 });
 
-server.listen(3000, () => {
-  console.log('Server listening on *:3000');
+server.listen(4000, () => {
+  console.log('Server listening on *:4000');
 });
