@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     /* styles.css */
-body {
+  body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -45,6 +45,7 @@ body {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 20px;
+    max-width: 600px;
   }
   
   .send-button {
@@ -70,27 +71,37 @@ body {
       font-size: 14px;
     }
   }
+  .user-info{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center; /* Horizontal centering */
+    align-items: center;
+  }
   </style>
 </head>
 <body>
   <div class="user-info">
-    <label for="username">Your Name:</label>
-    <input type="text" id="username" placeholder="Enter your name" />
-    <button id="join-button">Join Chat</button>
+    <label for="username"><b>Your Name:</b></label>
+    <input type="text" id="username" class="message-input" placeholder="Enter your name first!" />
+    <button id="join-button" class="send-button">Join Chat</button>
   </div>
   <div class="chat-container">
     <!-- Add this section inside the .chat-container div -->
     <div class="sidebar">
-      <h2>Online Users123</h2>
-      <ul id="user-list"></ul>
+      <h2>Online Users</h2>
+      <ul id="user-list" ></ul>
     </div>
 
     <div class="messages-container">
       <ul id="messages" class="messages"></ul>
     </div>
     <form id="form" class="message-form" action="">
-      <input id="input" class="message-input" autocomplete="off" placeholder="Type your message..."/>
-      <button class="send-button">Send</button>
+      <div class="message-input-section" style="display: none;"></div>
+        <input id="input" class="message-input" autocomplete="off" placeholder="Type your message..."/>
+        <button class="send-button">Send</button>
+    </div>
     </form>
   </div>
   <script src="/socket.io/socket.io.js"></script>
@@ -99,8 +110,8 @@ body {
     <script>
       $(function () {
         var socket = io();
-        var username = '';
-      
+        var username = "";
+
         $('#join-button').click(function() {
           username = $('#username').val().trim();
           if (username !== '') {
@@ -111,6 +122,11 @@ body {
         });
       
         $('#form').submit(function() {
+          while (username == '') {
+            alert("enter username first. ");
+            username = username.val().trim();
+            socket.emit('user joined', username);
+          }
           var message = $('#input').val();
           if (message.trim() !== '') {
             socket.emit('chat message', { username, message });
@@ -128,6 +144,10 @@ body {
       
         socket.on('user joined', function(newUser) {
           $('#user-list').append($('<li>').text(newUser));
+
+            if ($('#user-list li').length > 0) {
+            $('.message-input-section').show();
+        }
         });
       
         socket.on('user left', function(user) {
@@ -145,9 +165,29 @@ body {
           // Split the input string into an array of words
           const words = inputString.split(/\s+/);
           let str = "";
-          // Iterate through each word
+          //assignment-2 part
+          switch (words[0]) {
+            case "/help": {alert(`Working emojis: 'react'"⚛" 'hey' "👋" 'like' "❤" 'lol' "😂" 'woah'"😮" \n\n anything that starts with '/' will not get sent to all only to client side. \n\n Special Commands: /help /ranodm /clear"`)}
+                    break;
+            case "/random": {
+                const randomNumber = Math.random();
+                words[0] = randomNumber;
+              }
+                    break;
+            case "/clear": {
+                  const abcd = document.getElementById('messages');
+                  while (abcd.firstChild) {
+                      abcd.removeChild(abcd.firstChild);
+                    }
+                  }
+                  words = [];
+                    break;
+          }
+
+          //assignment-1 part
           for (let i = 0; i < words.length; i++) {
             let word = words[i];
+            word = word.toLowerCase();
             switch (word) {
               case 'react': word = "⚛"
                     break;
