@@ -32,6 +32,7 @@ db.once("open", () => {
 const messageSchema = new mongoose.Schema({
   username: String,
   message: String,
+  encryptedMessage: String,
   timestamp: { type: Date, default: Date.now },
 });
 
@@ -52,10 +53,18 @@ io.on("connection", (socket) => {
   socket.on("chat message", (msg) => {
     const message = {
       username: socket.username,
-      message: encryptMessage(msg.message),
+      message: msg.message,
+      encryptedMessage: encryptMessage(msg.message),
     };
 
     const newMessage = new Message(message);
+
+    let msg_string = JSON.stringify(msg["message"]).slice(1, -1);
+    if (msg_string.startsWith("/")) {
+      socket.emit("chat message", msg);
+    } else {
+      io.emit("chat message", message);
+    }
 
     // Use the promise returned by save
     newMessage
@@ -66,15 +75,6 @@ io.on("connection", (socket) => {
       .catch((error) => {
         console.error("Error saving message to MongoDB:", error);
       });
-
-    let msg_string = JSON.stringify(msg["message"]).slice(1, -1);
-    console.log("encrypted : " + encryptMessage(msg_string));
-    console.log(`message sent is ${msg_string}`);
-    if (msg_string.startsWith("/")) {
-      socket.emit("chat message", msg);
-    } else {
-      io.emit("chat message", message);
-    }
   });
 
   socket.on("disconnect", () => {
