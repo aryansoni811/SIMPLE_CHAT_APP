@@ -7,11 +7,15 @@ const { createCipheriv, randomBytes, createDecipheriv } = require("crypto");
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const key = randomBytes(32);
-const iv = randomBytes(16);
+const key = () => {
+  return randomBytes(32);
+};
+const iv = () => {
+  return randomBytes(16);
+};
 
 const encryptMessage = (normalMesage) => {
-  const cipher = createCipheriv("aes256", key, iv);
+  const cipher = createCipheriv("aes256", key(), iv());
   const newMessage =
     cipher.update(normalMesage, "utf8", "hex") + cipher.final("hex");
 
