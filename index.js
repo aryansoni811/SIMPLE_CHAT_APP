@@ -2,10 +2,21 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const mongoose = require("mongoose");
+const { createCipheriv, randomBytes, createDecipheriv } = require("crypto");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+const key = randomBytes(32);
+const iv = randomBytes(16);
+
+const encryptMessage = (normalMesage) => {
+  const cipher = createCipheriv("aes256", key, iv);
+  const newMessage =
+    cipher.update(normalMesage, "utf8", "hex") + cipher.final("hex");
+
+  return newMessage;
+};
 
 mongoose.connect(
   "mongodb+srv://arpitsoni811:mern_chat1234@cluster0.gcrpcuk.mongodb.net/?retryWrites=true&w=majority",
@@ -41,7 +52,7 @@ io.on("connection", (socket) => {
   socket.on("chat message", (msg) => {
     const message = {
       username: socket.username,
-      message: msg.message,
+      message: encryptMessage(msg.message),
     };
 
     const newMessage = new Message(message);
@@ -56,7 +67,8 @@ io.on("connection", (socket) => {
         console.error("Error saving message to MongoDB:", error);
       });
 
-    const msg_string = JSON.stringify(msg["message"]).slice(1, -1);
+    let msg_string = JSON.stringify(msg["message"]).slice(1, -1);
+    console.log("encrypted : " + encryptMessage(msg_string));
     console.log(`message sent is ${msg_string}`);
     if (msg_string.startsWith("/")) {
       socket.emit("chat message", msg);
